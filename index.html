@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大日本帝国 都市データ - EarthMC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #C41E3A;
+            --accent-red: #8B0000;
+            --text-dark: #1a1a1a;
+            --text-gray: #666;
+            --bg-white: #ffffff;
+            --bg-light: #fafafa;
+            --border-light: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            background: var(--bg-white);
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+        }
+
+        .lang-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .hero {
+            height: 30vh;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-gray);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .load-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        button:disabled {
+            background: var(--border-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            color: var(--text-gray);
+            margin-top: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .results {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 14px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-light);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.9rem;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+        }
+
+        .nation-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .rank {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .number {
+            text-align: right;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 24px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 12px;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lang-toggle" onclick="toggleLanguage()">
+        <span id="lang-text">English</span>
+    </div>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1 id="hero-title">大日本帝国 都市データ</h1>
+            <p id="hero-subtitle">EarthMC 全構成国家の都市情報</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="load-section">
+            <button onclick="loadData()" id="loadBtn">
+                <span id="btn-text">データを読み込む</span>
+            </button>
+            <div class="status" id="status"></div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="th-town">都市名</th>
+                            <th id="th-nation">所属国</th>
+                            <th id="th-population" class="number">人口</th>
+                            <th id="th-area" class="number">面積</th>
+                            <th id="th-mayor">市長</th>
+                            <th id="th-money" class="number">総資産</th>
+                            <th id="th-money-rank" class="number">資産順位</th>
+                            <th id="th-area-rank" class="number">面積順位</th>
+                            <th id="th-pop-rank" class="number">人口順位</th>
+                            <th id="th-lastonline">市長の最終オンライン</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p id="footer-text">大日本帝国 都市データ - EarthMC</p>
+    </footer>
+
+    <script>
+        let currentLang = 'ja';
+
+        const TARGET_NATIONS = new Set([
+            'ainu', 'dzungar', 'east_khazar', 'ezo_republic', 'hei', 'hokkaido',
+            'houten', 'izumo', 'japan', 'jin', 'karafuto', 'korea', 'manchuria',
+            'mappi', 'melanesia', 'mongolia', 'new_zealand', 'primorye', 'rouran',
+            'ryukyu', 'siberia', 'yamato', 'tosa'
+        ]);
+
+        const translations = {
+            ja: {
+                'lang-text': 'English',
+                'hero-title': '大日本帝国 都市データ',
+                'hero-subtitle': 'EarthMC 全構成国家の都市情報',
+                'btn-text': 'データを読み込む',
+                'footer-text': '大日本帝国 都市データ - EarthMC',
+                'th-town': '都市名',
+                'th-nation': '所属国',
+                'th-population': '人口',
+                'th-area': '面積',
+                'th-mayor': '市長',
+                'th-money': '総資産',
+                'th-money-rank': '資産順位',
+                'th-area-rank': '面積順位',
+                'th-pop-rank': '人口順位',
+                'th-lastonline': '市長の最終オンライン',
+                'loading': '読み込み中',
+                'processing': '処理中',
+                'complete': '完了'
+            },
+            en: {
+                'lang-text': '日本語',
+                'hero-title': 'Empire of Japan Town Data',
+                'hero-subtitle': 'Town information across all EarthMC nations',
+                'btn-text': 'Load Data',
+                'footer-text': 'Empire of Japan Town Data - EarthMC',
+                'th-town': 'Town',
+                'th-nation': 'Nation',
+                'th-population': 'Pop',
+                'th-area': 'Area',
+                'th-mayor': 'Mayor',
+                'th-money': 'Total Assets',
+                'th-money-rank': 'Money Rank',
+                'th-area-rank': 'Area Rank',
+                'th-pop-rank': 'Pop Rank',
+                'th-lastonline': 'Mayor Last Online',
+                'loading': 'Loading',
+                'processing': 'Processing',
+                'complete': 'Complete'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ja' ? 'en' : 'ja';
+            for (const [id, text] of Object.entries(translations[currentLang])) {
+                const element = document.getElementById(id);
+                if (element) element.textContent = text;
+            }
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            return date.toLocaleString(currentLang === 'ja' ? 'ja-JP' : 'en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString(currentLang === 'ja' ? 'ja-JP' : 'en-US');
+        }
+
+        async function loadData() {
+            const loadBtn = document.getElementById('loadBtn');
+            const status = document.getElementById('status');
+            const tbody = document.getElementById('tableBody');
+
+            loadBtn.disabled = true;
+            tbody.innerHTML = '';
+            status.textContent = translations[currentLang].loading + '...';
+
+            try {
+                const response = await fetch('https://api.earthmc.net/v3/aurora/nations');
+                const allNations = await response.json();
+                
+                const targetNations = allNations.filter(n => 
+                    TARGET_NATIONS.has(n.name.toLowerCase())
+                );
+
+                status.textContent = `${translations[currentLang].processing}: ${targetNations.length} ${currentLang === 'ja' ? '国' : 'nations'}`;
+
+                const allTowns = [];
+                for (let i = 0; i < targetNations.length; i++) {
+                    const nation = targetNations[i];
+                    status.textContent = `${translations[currentLang].processing}: ${nation.name} (${i + 1}/${targetNations.length})`;
+                    
+                    const towns = await processTownsFromNation(nation);
+                    allTowns.push(...towns);
+                    
+                    calculateRankings(allTowns);
+                    renderTable(allTowns);
+                }
+
+                status.textContent = `${translations[currentLang].complete}: ${allTowns.length} ${currentLang === 'ja' ? '都市' : 'towns'}`;
+                loadBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = `エラー: ${error.message}`;
+                loadBtn.disabled = false;
+            }
+        }
+
+        async function processTownsFromNation(nation) {
+            const townNames = nation.towns?.map(t => t.name) || [];
+            if (townNames.length === 0) return [];
+
+            const towns = [];
+            const BATCH_SIZE = 50;
+            
+            for (let i = 0; i < townNames.length; i += BATCH_SIZE) {
+                const batchNames = townNames.slice(i, i + BATCH_SIZE);
+                const batchResponse = await fetch('https://api.earthmc.net/v3/aurora/towns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: batchNames })
+                });
+                const batchTowns = await batchResponse.json();
+                towns.push(...batchTowns);
+            }
+
+            const mayorUUIDs = [...new Set(towns.map(t => t.mayor?.uuid).filter(Boolean))];
+            const mayorData = await fetchPlayerData(mayorUUIDs);
+
+            const processedTowns = [];
+            for (const town of towns) {
+                const residentUUIDs = town.residents?.map(r => r.uuid) || [];
+                const residentBalances = await fetchPlayerBalances(residentUUIDs);
+                
+                const mayor = mayorData.find(m => m.uuid === town.mayor?.uuid);
+                
+                processedTowns.push({
+                    name: town.name,
+                    nation: nation.name,
+                    population: town.stats?.numResidents || 0,
+                    area: town.stats?.numTownBlocks || 0,
+                    mayor: town.mayor?.name || '',
+                    totalMoney: (town.stats?.balance || 0) + residentBalances.reduce((a, b) => a + b, 0),
+                    lastOnline: mayor?.timestamps?.lastOnline || null,
+                    moneyRank: 0,
+                    areaRank: 0,
+                    popRank: 0
+                });
+            }
+
+            return processedTowns;
+        }
+
+        async function fetchPlayerData(uuids) {
+            if (uuids.length === 0) return [];
+            const BATCH_SIZE = 50;
+            const allPlayers = [];
+            
+            for (let i = 0; i < uuids.length; i += BATCH_SIZE) {
+                const batch = uuids.slice(i, i + BATCH_SIZE);
+                const response = await fetch('https://api.earthmc.net/v3/aurora/players', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: batch })
+                });
+                const players = await response.json();
+                allPlayers.push(...players);
+            }
+            
+            return allPlayers;
+        }
+
+        async function fetchPlayerBalances(uuids) {
+            if (uuids.length === 0) return [];
+            const BATCH_SIZE = 50;
+            const allBalances = [];
+            
+            for (let i = 0; i < uuids.length; i += BATCH_SIZE) {
+                const batch = uuids.slice(i, i + BATCH_SIZE);
+                try {
+                    const response = await fetch('https://api.earthmc.net/v3/aurora/players', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: batch })
+                    });
+                    const players = await response.json();
+                    allBalances.push(...players.map(p => p.stats?.balance || 0));
+                } catch (error) {
+                    allBalances.push(...Array(batch.length).fill(0));
+                }
+            }
+            
+            return allBalances;
+        }
+
+        function calculateRankings(towns) {
+            const sortedByMoney = [...towns].sort((a, b) => b.totalMoney - a.totalMoney);
+            const sortedByArea = [...towns].sort((a, b) => b.area - a.area);
+            const sortedByPop = [...towns].sort((a, b) => b.population - a.population);
+
+            towns.forEach(town => {
+                town.moneyRank = sortedByMoney.findIndex(t => t.name === town.name) + 1;
+                town.areaRank = sortedByArea.findIndex(t => t.name === town.name) + 1;
+                town.popRank = sortedByPop.findIndex(t => t.name === town.name) + 1;
+            });
+        }
+
+        function renderTable(towns) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            towns.forEach(town => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${town.name}</strong></td>
+                    <td><span class="nation-badge">${town.nation}</span></td>
+                    <td class="number">${formatNumber(town.population)}</td>
+                    <td class="number">${formatNumber(town.area)}</td>
+                    <td>${town.mayor}</td>
+                    <td class="number">${formatNumber(Math.round(town.totalMoney))}</td>
+                    <td class="number rank">${town.moneyRank}</td>
+                    <td class="number rank">${town.areaRank}</td>
+                    <td class="number rank">${town.popRank}</td>
+                    <td>${formatDateTime(town.lastOnline)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+
+</html>
