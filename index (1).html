@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大日本帝国 市長追跡 - EarthMC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #C41E3A;
+            --primary-gold: #FFD700;
+            --accent-red: #8B0000;
+            --text-dark: #1a1a1a;
+            --text-gray: #666;
+            --bg-white: #ffffff;
+            --bg-light: #fafafa;
+            --border-light: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            background: var(--bg-white);
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+        }
+
+        .lang-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .hero {
+            position: relative;
+            height: 40vh;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-gray);
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .controls {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            background: var(--bg-white);
+        }
+
+        select:hover, input:hover {
+            border-color: var(--primary-red);
+        }
+
+        input {
+            cursor: text;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:disabled {
+            background: var(--border-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-red);
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-light);
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        tr:hover {
+            background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-light);
+            border-top: 3px solid var(--primary-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .nation-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-online {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .status-offline {
+            color: var(--text-gray);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-red) 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 16px;
+            }
+
+            .control-row {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lang-toggle" onclick="toggleLanguage()">
+        <span id="lang-text">English</span>
+    </div>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1 id="hero-title">大日本帝国 市長追跡</h1>
+            <p id="hero-subtitle">EarthMC 全構成国家の市長の最終オンライン時刻を追跡</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="filterNation" id="label-filter">国家フィルター</label>
+                    <select id="filterNation">
+                        <option value="">全ての国家</option>
+                        <option value="Ainu">Ainu</option>
+                        <option value="Ezo_Republic">Ezo_Republic</option>
+                        <option value="Hei">Hei</option>
+                        <option value="Hokkaido">Hokkaido</option>
+                        <option value="Houten">Houten</option>
+                        <option value="Izumo">Izumo</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Jin">Jin</option>
+                        <option value="Karafuto">Karafuto</option>
+                        <option value="Korea">Korea</option>
+                        <option value="Manchuria">Manchuria</option>
+                        <option value="Mappi">Mappi</option>
+                        <option value="Melanesia">Melanesia</option>
+                        <option value="Mongolia">Mongolia</option>
+                        <option value="Primorye">Primorye</option>
+                        <option value="Rouran">Rouran</option>
+                        <option value="Ryukyu">Ryukyu</option>
+                        <option value="Siberia">Siberia</option>
+                        <option value="Yamato">Yamato</option>
+                        <option value="tosa">tosa</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="filterName" id="label-search">名前検索</label>
+                    <input type="text" id="filterName" placeholder="プレイヤー名を入力">
+                </div>
+
+                <div class="control-group">
+                    <label for="sortSelect" id="label-sort">並べ替え</label>
+                    <select id="sortSelect">
+                        <option value="oldest" selected>オンライン古い順</option>
+                        <option value="newest">オンライン新しい順</option>
+                        <option value="name">名前順</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="displaySelect" id="label-display">表示形式</label>
+                    <select id="displaySelect">
+                        <option value="days" selected>経過日数</option>
+                        <option value="date">完全な日付</option>
+                        <option value="relative">相対時間</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="loadAllData()" id="load-button">全データを読み込む</button>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label" id="stat-total-label">総市長数</div>
+                <div class="stat-value" id="totalMayors">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" id="stat-online-label">現在オンライン</div>
+                <div class="stat-value" id="onlineMayors">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" id="stat-avg-label">平均オフライン日数</div>
+                <div class="stat-value" id="avgDaysOffline">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" id="stat-nations-label">読み込んだ国家数</div>
+                <div class="stat-value" id="loadedNations">0</div>
+            </div>
+        </div>
+
+        <div class="results">
+            <div class="table-wrapper">
+                <table id="resultsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th id="th-player">プレイヤー</th>
+                            <th id="th-town">町</th>
+                            <th id="th-nation">国家</th>
+                            <th id="th-status">状態</th>
+                            <th id="th-lastonline">最終オンライン</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                    </tbody>
+                </table>
+                <div id="loading" class="loading">
+                    <span id="loading-text">ボタンをクリックして全20国家のデータを読み込んでください</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p id="footer-text">大日本帝国 市長追跡 - EarthMC</p>
+    </footer>
+
+    <script>
+        let currentLang = 'ja';
+        let allMayors = [];
+
+        const NATIONS = [
+            'Ainu', 'Ezo_Republic', 'Hei', 'Hokkaido', 'Houten', 'Izumo', 'Japan', 
+            'Jin', 'Karafuto', 'Korea', 'Manchuria', 'Mappi', 'Melanesia', 'Mongolia', 
+            'Primorye', 'Rouran', 'Ryukyu', 'Siberia', 'Yamato', 'tosa'
+        ];
+
+        const translations = {
+            ja: {
+                'lang-text': 'English',
+                'hero-title': '大日本帝国 市長追跡',
+                'hero-subtitle': 'EarthMC 全構成国家の市長の最終オンライン時刻を追跡',
+                'label-filter': '国家フィルター',
+                'label-search': '名前検索',
+                'label-sort': '並べ替え',
+                'label-display': '表示形式',
+                'load-button': '全データを読み込む',
+                'stat-total-label': '総市長数',
+                'stat-online-label': '現在オンライン',
+                'stat-avg-label': '平均オフライン日数',
+                'stat-nations-label': '読み込んだ国家数',
+                'th-player': 'プレイヤー',
+                'th-town': '町',
+                'th-nation': '国家',
+                'th-status': '状態',
+                'th-lastonline': '最終オンライン',
+                'loading-text': 'ボタンをクリックして全20国家のデータを読み込んでください',
+                'footer-text': '大日本帝国 市長追跡 - EarthMC',
+                'status-online': 'オンライン',
+                'status-offline': 'オフライン',
+                'today': '今日',
+                'days-ago': '日前',
+                'filter-all': '全ての国家',
+                'search-placeholder': 'プレイヤー名を入力'
+            },
+            en: {
+                'lang-text': '日本語',
+                'hero-title': 'Empire of Japan Mayor Tracker',
+                'hero-subtitle': 'Track mayor last online times across all EarthMC nations',
+                'label-filter': 'Nation Filter',
+                'label-search': 'Name Search',
+                'label-sort': 'Sort By',
+                'label-display': 'Display Format',
+                'load-button': 'Load All Data',
+                'stat-total-label': 'Total Mayors',
+                'stat-online-label': 'Currently Online',
+                'stat-avg-label': 'Average Days Offline',
+                'stat-nations-label': 'Nations Loaded',
+                'th-player': 'Player',
+                'th-town': 'Town',
+                'th-nation': 'Nation',
+                'th-status': 'Status',
+                'th-lastonline': 'Last Online',
+                'loading-text': 'Click button to load data from all 20 nations',
+                'footer-text': 'Empire of Japan Mayor Tracker - EarthMC',
+                'status-online': 'Online',
+                'status-offline': 'Offline',
+                'today': 'Today',
+                'days-ago': ' days ago',
+                'filter-all': 'All Nations',
+                'search-placeholder': 'Enter player name'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ja' ? 'en' : 'ja';
+
+            for (const [id, text] of Object.entries(translations[currentLang])) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = text;
+                }
+            }
+
+            document.getElementById('filterName').placeholder = translations[currentLang]['search-placeholder'];
+            
+            const filterNation = document.getElementById('filterNation');
+            const currentValue = filterNation.value;
+            filterNation.innerHTML = `<option value="">${translations[currentLang]['filter-all']}</option>` + 
+                NATIONS.map(n => `<option value="${n}">${n}</option>`).join('');
+            filterNation.value = currentValue;
+
+            if (currentLang === 'en') {
+                document.getElementById('sortSelect').innerHTML = `
+                    <option value="oldest">Oldest Online</option>
+                    <option value="newest">Newest Online</option>
+                    <option value="name">Name (A-Z)</option>
+                `;
+                document.getElementById('displaySelect').innerHTML = `
+                    <option value="days">Days Ago</option>
+                    <option value="date">Full Date</option>
+                    <option value="relative">Relative Time</option>
+                `;
+            } else {
+                document.getElementById('sortSelect').innerHTML = `
+                    <option value="oldest">オンライン古い順</option>
+                    <option value="newest">オンライン新しい順</option>
+                    <option value="name">名前順</option>
+                `;
+                document.getElementById('displaySelect').innerHTML = `
+                    <option value="days">経過日数</option>
+                    <option value="date">完全な日付</option>
+                    <option value="relative">相対時間</option>
+                `;
+            }
+
+            if (allMayors.length > 0) {
+                renderResults();
+            }
+        }
+
+        function formatTime(timestamp, format) {
+            if (!timestamp) return currentLang === 'ja' ? 'なし' : 'Never';
+            
+            const date = new Date(timestamp);
+            const now = Date.now();
+            const diffMs = now - timestamp;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (format === 'days') {
+                if (diffDays === 0) return translations[currentLang]['today'];
+                return currentLang === 'ja' ? `${diffDays}${translations[currentLang]['days-ago']}` : `${diffDays}${translations[currentLang]['days-ago']}`;
+            } else if (format === 'date') {
+                return date.toLocaleString(currentLang === 'ja' ? 'ja-JP' : 'en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } else {
+                if (diffDays === 0) return translations[currentLang]['today'];
+                if (diffDays === 1) return currentLang === 'ja' ? '昨日' : 'Yesterday';
+                if (diffDays < 7) return currentLang === 'ja' ? `${diffDays}日前` : `${diffDays} days ago`;
+                if (diffDays < 30) {
+                    const weeks = Math.floor(diffDays / 7);
+                    return currentLang === 'ja' ? `${weeks}週間前` : `${weeks} weeks ago`;
+                }
+                if (diffDays < 365) {
+                    const months = Math.floor(diffDays / 30);
+                    return currentLang === 'ja' ? `${months}ヶ月前` : `${months} months ago`;
+                }
+                const years = Math.floor(diffDays / 365);
+                return currentLang === 'ja' ? `${years}年前` : `${years} years ago`;
+            }
+        }
+
+        async function loadAllData() {
+            const loading = document.getElementById('loading');
+            const resultsTable = document.getElementById('resultsTable');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const button = document.getElementById('load-button');
+            
+            button.disabled = true;
+            loading.innerHTML = '<div class="spinner"></div><div>' + (currentLang === 'ja' ? 'データを読み込み中...' : 'Loading data...') + '</div>';
+            loading.style.display = 'block';
+            resultsTable.style.display = 'none';
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+
+            allMayors = [];
+            let loadedCount = 0;
+
+            try {
+                for (let i = 0; i < NATIONS.length; i++) {
+                    const nationName = NATIONS[i];
+                    
+                    try {
+                        const nationResponse = await fetch('https://api.earthmc.net/v3/aurora/nations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query: [nationName] })
+                        });
+                        
+                        const nations = await nationResponse.json();
+                        
+                        if (nations && nations.length > 0) {
+                            const nation = nations[0];
+                            const playerUuids = nation.residents.map(r => r.uuid);
+
+                            if (playerUuids.length > 0) {
+                                const playersResponse = await fetch('https://api.earthmc.net/v3/aurora/players', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ query: playerUuids })
+                                });
+
+                                const players = await playersResponse.json();
+                                const mayors = players.filter(p => p.status.isMayor);
+                                allMayors.push(...mayors);
+                                loadedCount++;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error loading ${nationName}:`, error);
+                    }
+
+                    progressFill.style.width = `${((i + 1) / NATIONS.length) * 100}%`;
+                }
+
+                document.getElementById('loadedNations').textContent = loadedCount;
+                renderResults();
+                button.disabled = false;
+
+            } catch (error) {
+                loading.textContent = (currentLang === 'ja' ? 'エラー: ' : 'Error: ') + error.message;
+                button.disabled = false;
+            }
+        }
+
+        function renderResults() {
+            const sortBy = document.getElementById('sortSelect').value;
+            const displayFormat = document.getElementById('displaySelect').value;
+            const filterNation = document.getElementById('filterNation').value;
+            const filterName = document.getElementById('filterName').value.toLowerCase();
+            
+            let sorted = [...allMayors];
+
+            if (filterNation) {
+                sorted = sorted.filter(p => p.nation && p.nation.name === filterNation);
+            }
+
+            if (filterName) {
+                sorted = sorted.filter(p => p.name.toLowerCase().includes(filterName));
+            }
+
+            if (sortBy === 'oldest') {
+                sorted.sort((a, b) => (a.timestamps.lastOnline || 0) - (b.timestamps.lastOnline || 0));
+            } else if (sortBy === 'newest') {
+                sorted.sort((a, b) => (b.timestamps.lastOnline || 0) - (a.timestamps.lastOnline || 0));
+            } else if (sortBy === 'name') {
+                sorted.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+
+            sorted.forEach(player => {
+                const row = document.createElement('tr');
+                const statusText = player.status.isOnline ? translations[currentLang]['status-online'] : translations[currentLang]['status-offline'];
+                const statusClass = player.status.isOnline ? 'status-online' : 'status-offline';
+                
+                row.innerHTML = `
+                    <td><strong>${player.name}</strong></td>
+                    <td>${player.town ? player.town.name : (currentLang === 'ja' ? '町なし' : 'No Town')}</td>
+                    <td><span class="nation-badge">${player.nation ? player.nation.name : (currentLang === 'ja' ? '国家なし' : 'No Nation')}</span></td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>${formatTime(player.timestamps.lastOnline, displayFormat)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const onlineCount = sorted.filter(p => p.status.isOnline).length;
+            const avgDaysOffline = sorted.length > 0 ? sorted.reduce((sum, p) => {
+                if (!p.timestamps.lastOnline) return sum;
+                const days = Math.floor((Date.now() - p.timestamps.lastOnline) / (1000 * 60 * 60 * 24));
+                return sum + days;
+            }, 0) / sorted.length : 0;
+
+            document.getElementById('totalMayors').textContent = sorted.length;
+            document.getElementById('onlineMayors').textContent = onlineCount;
+            document.getElementById('avgDaysOffline').textContent = Math.round(avgDaysOffline);
+
+            document.getElementById('stats').style.display = 'grid';
+            document.getElementById('resultsTable').style.display = 'table';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+        }
+
+        document.getElementById('sortSelect').addEventListener('change', () => {
+            if (allMayors.length > 0) renderResults();
+        });
+
+        document.getElementById('displaySelect').addEventListener('change', () => {
+            if (allMayors.length > 0) renderResults();
+        });
+
+        document.getElementById('filterNation').addEventListener('change', () => {
+            if (allMayors.length > 0) renderResults();
+        });
+
+        document.getElementById('filterName').addEventListener('input', () => {
+            if (allMayors.length > 0) renderResults();
+        });
+    </script>
+</body>
+
+</html>
